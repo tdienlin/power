@@ -1,6 +1,6 @@
 ---
 author: Tobias Dienlin
-date: 28.02.2018
+date: 01.03.2019
 title: What is statistical power? A brief tutorial
 output: 
   html_document: default
@@ -163,7 +163,7 @@ system2("magick",
 file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 ```
 
-![](figures/power_50_animated.gif)
+![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_50_animated.gif)
 
 What do we see? Correctly, a lot of red dots. Given that the relation actually does exist in the population, that seems too much. How often have we been right?
 
@@ -237,7 +237,7 @@ system2("magick",
 file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 ```
 
-![](figures/power_95_animated.gif)
+![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_95_animated.gif)
 
 Indeed, it does. In `r sum(results$significant)` cases we found a significant result. In other words, we had a `r mean(as.numeric(results$significant)) * 100` % probability of finding the effect! Hence, our statistical power was `r mean(results$significant) * 100` %. 
 

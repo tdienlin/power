@@ -35,7 +35,7 @@ At least that was the way _I_ felt. Once it really clicked, it became an absolut
 
 ## What is power?
 
-In short, it describes the probablility of you being able to cry "Heureka! I found it!", when in fact there was something to be found (see, e.g., the posts by [psychbrief](http://psychbrief.com/power-curve/) or [Daniel Lakens](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html)). Often, though not always, that's exactly what you want, which is why ideally you would like to increase that probability. 
+In short, it describes the probablility of you being able to cry "Eureka! I found it!", when in fact there was something to be found. In other words, if there is an effect, how often will you find it in the long run? Often, though not always, that's exactly what you want, which is why ideally you would like to increase that probability. 
 
 More specifically, the power of a study can be calculated once you know:
 
@@ -68,7 +68,7 @@ So let's imagine we want to find out whether the privacy paradox exists among th
 
 ### Data simulation
 
-In Hohenheim there are currently 10.000 students (our population). Building on Baruh et al. (2017), we define that the actual correlation between privacy concerns and information sharing is _r_ = -.13. 
+In Hohenheim there are currently 10,000 students (our population). Building on Baruh et al. (2017), we define that the actual correlation between privacy concerns and information sharing is _r_ = -.13. 
 
 (For simplicity's sake, I'm sticking with standardized effects throughout this blog. I know that unstandardized effects would be preferable, but it's a bit easier both from a didactical and data-simulation perspective.)
 
@@ -79,9 +79,13 @@ library(ggplot2); library(magick); library(pwr); library(tidyverse)
 # set seed; necessary for reproducing the analyses
 set.seed(170819)
 
-# define parameters
+# define population size
 n_pop <- 10000
+
+# define effect size of interest
 r_pop <- - .13
+
+# define alpha level
 alpha_crit <- .05
 
 # simulate values for privacy concerns
@@ -104,9 +108,9 @@ Yes indeed, in our population we have a correlation of _r_ = -.13.
 
 ### Run study
 
-Now, let's imagine we're running a study to find out whether the privacy paradox exists. Because we cannot ask all `r n_pop` students, we're going to collect a sample. 
+Now, let's imagine we're running a study to find out whether the privacy paradox exists. Because we cannot ask all 10,000 students, we're going to collect a sample. 
 
-How many? Good question. 200 seems quite a lot -- that should do the job, right? So let's simulate a study by drawing a random sample of 200 people of our population. Will we find an effect ... ?
+How many? Good question. 200 seems quite a lot -- that should do the job, right? So from the population, we will now draw 200 students and estimate the correlation. Will we find an effect ... ?
 
 ```{r}
 # define sample size
@@ -131,7 +135,7 @@ As a result, we find a correlation of _r_ = `r results_complete$estimate` and a 
 ![](https://media.giphy.com/media/63MWfMm5UYyxJlhY0K/giphy.gif)
 </center>
 
-Normally, we would now conclude that yes, the privacy paradox indeed seems to be a thing, because on the basis of the data we cannot reject it. Which would be false, of course.
+Normally, we would now conclude that yes, the privacy paradox indeed seems to be a thing, because on the basis of the data we cannot reject it. So we would incorrectly conclude that there is nothing -- although we know there is an effect!
 
 But first let's run another study.
 
@@ -197,7 +201,9 @@ file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 
 ![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_50_animated.gif)
 
-What do we see? Sometime we get significant effects, sometime we don't. But given that the relation actually does exist in the population, that's bad. How often have we been right?
+What do we see? On the x-axis, you see the number of the study (1 - 100). The y-axis shows the effect size we found for each study. The blue dots represent significant effects, the red dots nonsignificant ones. 
+
+What does this mean? Sometime we get significant effects, sometime we don't. But given that the relation actually does exist in the population, that's bad. How often have we been right?
 
 ```{r}
 mean(results$significant)
@@ -222,7 +228,7 @@ As you can see, we get a very similar result: the power is `r power$power * 100`
 
 If we want to analyze the privacy paradox, we would more often than not claim that there is no effect, that the privacy paradox indeed exists, when in fact it does not. In other words, with 200 people we simply cannot analyze the privacy paradox! Our study would not be informative, it would not add _anything_ to our understanding of the theoretical problem.
 
-Of course this does not only pertain to the privacy paradox. It is valid for _all_ research questions where you would expect a small effect and which is analyzed on the basis of a small sample. Hence, if you read a paper where you think "hmmm, this effect should most likely be small ... " and the study includes say 200 observations, you can stop reading at that point.
+Of course this does not only pertain to the privacy paradox. It is valid for _all_ research questions where you would expect a similar-sized, small effect (here, _r_ = .13) and which is analyzed on the basis of a small sample. Hence, if you read a paper where you think "hmmm, this effect should most likely be small ... " and the study includes, say, 200 observations, you can stop reading at that point.
 
 <center>
 ![](https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif)
@@ -230,7 +236,7 @@ Of course this does not only pertain to the privacy paradox. It is valid for _al
 
 ### How much power, how many observations?
 
-So what level of power would be ideal? Now, remember that in our example the effect actually exists. So of course we want our study to have a very good chance of finding that effect -- otherwise we would be wasting away important ressources, while risking to come up with false theoretical conclusions. Therefore, in most scenarios it's safe to say that the more power the better.
+So what level of power would be ideal? Now, remember that in our example the effect actually exists. So of course we want our study to have a very good chance of finding that effect -- otherwise we would be wasting important ressources, while risking to come up with false theoretical conclusions. Therefore, in most scenarios it's safe to say that the more power the better.
 
 How much exactly? People often quote Cohen (1992) and state that studies should have a power of 80%. However, and maybe it's just me, but I think that's still too risky. If I only have a 80% probability of finding something that _actually exists_, I think I would rather invest more ressources and recruit additional participants. Personally, I most cases I would feel much more comfortable with 95% probability.
 
@@ -238,7 +244,7 @@ How much exactly? People often quote Cohen (1992) and state that studies should 
 ![](https://media.giphy.com/media/5wWf7GR2nhgamhRnEuA/giphy.gif)
 </center>
 
-(Similarly to the alpha error, it's an even better idea to also specifically justify one's power depending on what's at stake.)
+(Similarly to the alpha error, it's an even better idea to also specifically justify one's power depending on what's at stake. For starters, it's sensible to balance one's alpha and beta errors; Rouder et al., 2016)
 
 But how many participants would we need to collect in order to attain that probability? Again, we can estimate that using the package `pwr`.
 
@@ -298,6 +304,8 @@ Indeed, it does! In `r sum(results$significant)` cases we found a significant re
 ![](https://media.giphy.com/media/9EC1okpxH360M/giphy.gif)
 </center>
 
+There are additional benefits of conducting well-powered studies. To mention only one, effect sizes become more accurate. Put differently, small samples produce artificially inflated effect sizes (Button et al., 2013) -- which can be seen when comparing the two gifs.
+
 Before we wrap up, let us briefly address another important concept.
 
 ## Smallest effect size of interest
@@ -306,7 +314,7 @@ When trying to convince some colleagues of the necessity to run power analyses, 
 
 "I'd like to, but for my research question there isn't yet a meta analysis suggesting the actual effect size -- so it's not possible to run meaningful a priori power analyses". 
 
-That's not true. In fact, instead of basing your power analysis on a meta-analysis (whose effect is likely to be biased anyway), it is more expedient to determine a so-called smallest effect size of interest (SESOI) (e.g., Lakens et al., 2018). In other words, you want to define an effect size that you think is already large enough to qualify as proof for your theoretical assumption.
+That's not true. In fact, instead of basing your power analysis on a meta-analysis (whose effect is likely to be biased anyway), it is more expedient to determine a so-called smallest effect size of interest (SESOI) (e.g., Lakens et al., 2018). In other words, you want to define an effect size that you think is already large enough to qualify as support for your theoretical assumption.
 
 <center>
 ![](https://media.giphy.com/media/km2mais9qzYI/giphy.gif)
@@ -334,11 +342,11 @@ Not the number of participants decides, but the number of observations. Often it
 
 **3. Team up with others**
 
-Researchers routinely cooperate in order to be able to collect sufficient observations. Most prominently, in psychology there is the so-called [Psychological Science Accelerator](https://psysciacc.org/), which pools the resources of several labs in order to be able to design large-scale studies. In addition, an increasing number of researchers run so-called multi-site studies (without artifically focusing on cultural aspects). Also in BA, MA or PhD theses, it is highly advisable to join forces and to collect data together. Only because your advisor collected the data himself/herself, it does not mean that you have to do the same as well.
+Researchers routinely cooperate in order to be able to collect sufficient observations. Most prominently, in psychology there is the so-called [Psychological Science Accelerator](https://psysciacc.org/) or the [StudySwap](https://osf.io/view/StudySwap/) initiative, which both pool the resources of several labs in order to be able to design large-scale studies. In addition, an increasing number of researchers run so-called multi-site studies (without artifically focusing on cultural aspects). Also in BA, MA or PhD theses, it is highly advisable to join forces and to collect data together. Just because your advisor collected the data himself/herself, it does not mean that you have to do the same as well.
 
 **4. Adapt your research questions**
 
-It might sound depressing, but sometimes there's no way around adapting or altogether leaving your research question. For example, if you're interested in priming effects induced by the subtlest of changes to your stimuli, then you either need a ton of ressources or a different research question. There's no inherent right to analyze a specific research question -- some are not feasible. But to our avail there are remedies: For example, it's often possible to use stimuli that are more salient, adopt a different research paradigm, or change general variables in favor of more specific ones -- all mechanisms that can increase your power.
+It might sound depressing, but sometimes there's no way around adapting or altogether leaving your research question. For example, if you're interested in priming effects induced by the subtlest of changes to your stimuli, then you either need a ton of ressources or a different research question. There's no inherent right or entitlement to analyze a specific research question -- some are not feasible. But to our avail there are remedies: For example, it's often possible to use stimuli that are more salient, adopt a different research paradigm, or change general variables in favor of more specific ones -- all mechanisms that can increase your power.
 
 ## Conclusion
 
@@ -349,6 +357,12 @@ Be the change you want to see. No reason to fret, we can do it.
 <center>
 ![](https://media.giphy.com/media/3ofSB5PPO4cbZMK796/giphy.gif)
 </center>
+
+## Further Readings
+
+- [Why you should think of statistical power as a curve](http://psychbrief.com/power-curve/) by psychbrief.
+- [How a power analysis implicitly reveals the smallest effect size you care about](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html) by Daniel Lakens.
+- [A power primer](https://www.ime.usp.br/~abe/lista/pdfn45sGokvRe.pdf) by Jacob Cohen.
 
 ## References
 

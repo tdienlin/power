@@ -298,7 +298,7 @@ Indeed, it does! In `r sum(results$significant)` cases we found a significant re
 ![](https://media.giphy.com/media/9EC1okpxH360M/giphy.gif)
 </center>
 
-Before we wrap up, let us briefly address on another important concept.
+Before we wrap up, let us briefly address another important concept.
 
 ## Smallest effect size of interest
 

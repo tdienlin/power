@@ -1,133 +1,163 @@
 ---
 author: Tobias Dienlin
 date: 01.03.2019
-title: What is statistical power? A brief tutorial
+title: What is statistical power? An illustration using simulated data
 output: 
   html_document: default
-#  pdf_document: default
+bibliography: bibliography.bib
 ---
 ```{r include = FALSE}
 knitr::opts_chunk$set(warning = F, message = F)
 options(digits = 2)
 ```
 
-In what follows, I try to explain the statistical concept of power. As we Germans say: Everything you need to know has been said already, but not by everyone. So let me briefly explain. I have written this post primarily for our students, with the aim to provide some guidelines for how to run power analyses for their theses. In addition, I'll also provide the R-code necessary to run power analyses, so everyone new to the topic might also benefit. Let's begin!
+In Germany we have the following saying: Everything that you need to know about power has already been said -- but not yet by everyone. Hence, in what follows, I take my turn and try to explain the concept of statistical power using my own words, simulations of data, and some gifs.
 
-# Why should I care about power?
+Note that this post is written primarily for students, to provide some guidelines when it comes to writing theses or reports. I'll provide the R-code necessary for all the analyses, and you can also download everything from my [github](https://github.com/tdienlin/power). 
 
-Power is an extremely important statistical concept. The importance of having a well-powered study cannot be underestimated. I would say that when assesing a study's quality, it belongs to the most relevant indicators. 
+<center>
+![](https://media.giphy.com/media/1M9fmo1WAFVK0/giphy.gif)
+</center>
 
-If you're now thinking, "Aaaah, he's exaggerating", or if you feel like power is a nuisance, another one of those pesky concepts of nerdy statisticians, I think it's save to say that you simply haven't yet fully understood power. (At least, that was the way I felt once I better understood the concept.)
+## Why should I care about power?
 
-Hence, I sincerely hope that this blog post convinces you that power is indeed something that you should care for -- in you're very own interest.
+Power is an extremely relevant statistical concept. It's hard to underestimate the importance of studies being well-powered . I would say that when assessing the quality of an empirical study, having adequate power belongs to one of the most crucial aspects. 
 
-# What is power?
+If you think that this is an exaggeration or if you feel like running power analyses is a nuisance, another one of those pesky concepts that nerdy statisticians force you to implement, I would reply the following: 
 
-In short, the statistical power of a study describes the probablility of you being able to cry "heureka! I found a significant effect!". And as we all want to be able to do that, you'd ideally want to increase that probability (but see my thoughts on the SESOI below). 
+You probably haven't yet fully understood power.
 
-More specifically, the power of a study can be estimated once you know ... 
+<center>
+![](https://media.giphy.com/media/3o7527pa7qs9kCG78A/giphy.gif)
+</center>
 
-- what test you want to run (say, a correlation or an ANOVA), 
-- what effect you want to be able to find (e.g., _r_ = .1, _d_ = .2), 
-- the probability of committing an alpha error[^1] (in most cases that'd be alpha = .05), 
-- and -- maybe most importantly -- the number of observations you have collected (e.g., _n_ = 200). 
+At least that was the way _I_ felt. Once it really clicked, it became an absolute nobrainer that running a priori power analyses to determine adequate sample size is, above oll, in my very _own_ interest.
 
-[^1]: That is, stating that there is an effect when in truth there's no effect. 
+## What is power?
 
-If you have that, you can calculate the power of your study. But calculations are one thing. What's even more illustrative are simulations. I think I really understood power once I saw some tutorial with simulations.
+In short, it describes the probablility of you being able to cry "Heureka! I found it!", when in fact there was something to be found (see, e.g., the posts by [psychbrief](http://psychbrief.com/power-curve/) or [Daniel Lakens](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html)). Often, though not always, that's exactly what you want, which is why ideally you would like to increase that probability. 
 
-# Example
+More specifically, the power of a study can be calculated once you know:
 
-To illustrate the importance of power, let us have a look at a typical example from my research as a media psychologist. Namely, I'm very much interested in the so-called privacy paradox, which states that the privacy concerns of people are unrelated to their actual information sharing behavior. I think it's safe to say that this strict understanding of the privacy paradox has been refuted by now. For example, in a meta analyses Baruh et al. (2015) have found that privacy concerns and information sharing exhibits a relation of _r_ = -.13. Hence, if people are more concerned, they are (slighty) less willing to share information. Let's start!
+- What _test_ you want to run (say, a correlation or an ANOVA) 
+- What _effect_ you want to be able to find (e.g., _r_ = .1, _d_ = .2)
+- The probability of committing an _alpha error_ (the convention is 5%. Pros, however, justify their choice of alpha specifically for each study depending on what's at stake; Lakens et al., 2017)
+- The _number of observations_ you have collected (e.g., _n_ = 200)
 
-First off, we're going to load two packages that we will need. We will also plant a set seed, so that if you should decide to rerun these analyses, you'll get the same results.
+But calculations are one thing. What's even more illustrative are simulations. I think I only really started to understand power once I saw some tutorials with simulations of actual data (see, for example, Laken's excellent mooc [Improving your statistical inferences](https://www.coursera.org/learn/statistical-inferences)). 
 
-```{r load-packages, message=FALSE}
-# load packages
-library(gganimate); library(ggplot2); library(magick); library(pwr); 
-library(tidyverse)
+The main advantage of simulating your own data is that you can actually specifiy the *true* effect in the population. So, by definition, you _know_ what result your study should reveal.
 
-devtools::install_github(c("duncantl/XMLRPC", "duncantl/RWordPress"))
-library(RWordPress)
+<center>
+![](https://media.giphy.com/media/kuTpXMNmCnNte/giphy.gif)
+</center>
 
-# set seed
-set.seed(170819)
-```
+## Does the privacy paradox exist in Hohenheim?
 
-Right, so let's imagine we want to find out whether the privacy paradox exists among the students in Hohenheim. Hence, our population is as large as 10.000 people. Let us first simulate some data. This way, we know what the *true* effect in the population is. Building on Baruh, let us assume that the actual correlation between privacy concerns and information sharing is -.13.[^2]
+To make things more palpable, let us create data for a typical research question from my own field, media psychology. Personally, I'm interested in the so-called _privacy paradox_, which states that the privacy concerns of people are unrelated to their actual information sharing behavior (e.g., Barnes, 2006). 
 
-[^2]: For simplicity's sake, I'm sticking with standardized effects throughout this blog. I know that unstandardized would be preferable, but it's a bit easier both from a didactical and a data-simulation perspective.
+I think it's safe to say that by now the privacy paradox has been refuted by and large (e.g., Dienlin & Metzger, 2016). For example, a recent meta analysis found that privacy concerns and information sharing exhibit a relation of _r_ = -.13 (Baruh et al., 2017). Hence, if people are more concerned, they are (slighty) less willing to share information. 
+
+So let's imagine we want to find out whether the privacy paradox exists among the students in Hohenheim. Let's create some data! 
+
+<center>
+![](https://media.giphy.com/media/rVbAzUUSUC6dO/giphy.gif)
+</center>
+
+### Data simulation
+
+In Hohenheim there are currently 10.000 students (our population). Building on Baruh et al. (2017), we define that the actual correlation between privacy concerns and information sharing is _r_ = -.13. 
+
+(For simplicity's sake, I'm sticking with standardized effects throughout this blog. I know that unstandardized effects would be preferable, but it's a bit easier both from a didactical and data-simulation perspective.)
 
 ```{r}
-# define population size
-n_hoh <- 10000
+# load packages
+library(ggplot2); library(magick); library(pwr); library(tidyverse)
+
+# set seed; necessary for reproducing the analyses
+set.seed(170819)
+
+# define parameters
+n_pop <- 10000
+r_pop <- - .13
+alpha_crit <- .05
 
 # simulate values for privacy concerns
-priv_con <- rnorm(n = n_hoh, mean = 0, sd = 1)
+priv_con <- rnorm(n = n_pop, mean = 0, sd = 1)
 
-# compute values for information sharing that are related to privacy concerns
-inf_sha <- - .13 * priv_con + rnorm(n = n_hoh, mean = 0, sd = 1)
+# simulate values for information sharing that are related to privacy concerns
+inf_sha <- r_pop * priv_con + rnorm(n = n_pop, mean = 0, sd = 1)
 
 # save as data.frame
 d <- data.frame(priv_con, inf_sha)
 ```
 
-Let's check whether the simulation worked.
+Let's first check whether the simulation worked.
 
 ```{r}
 cor.test(d$priv_con, d$inf_sha, method = "pearson")
 ```
 
-Yes indeed, in our population we have a true effect of _r_ = -.13.
+Yes indeed, in our population we have a correlation of _r_ = -.13.
 
-Now, let's imagine we ask 200 students regarding their privacy concerns and their information sharing behavior. What do we find?
+### Run study
+
+Now, let's imagine that we're running a study to find out whether the privacy paradox exists. Because we cannot ask all `r n_pop` students, we're going to collect a sample. 
+
+How many? Good question. 200 hundred seems quite a lot, that should do the job, right? So let's simulate a study by drawing a random sample of 200 hundred participants of our population. Will we find an effect ... ?
 
 ```{r}
 # define sample size
-n <- 200
+n_sample <- 200
 
-# define participants who we are going to be selected for the subsample
-sample <- sample(nrow(d), n)
+# randomly define participants who are going to be selected for the study
+id_sample <- sample(nrow(d), n_sample)
 
 # create dataframe of subsample
-d_sample <- d[sample, ]
+d_sample <- d[id_sample, ]
 
 # calculate correlation
 results_complete <- cor.test(d_sample$priv_con, 
                                 d_sample$inf_sha, 
                                 method = "pearson")
-
-# extract results
-results <- data.frame(results_complete$estimate,
-                      results_complete$p.value,
-                      ifelse(results_complete$p.value < .05, TRUE, FALSE))
+print(results_complete)
 ```
 
-We find a correlation of _r_ = `r results$r` and a p-value of _p_ = `r results$p`, which is `r ifelse(isTRUE(results$significant), print("significant"), print("not significant"))`. Let's run the study again.
+As a result, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`. Hence, our result is not significant. Bummer!
+
+<center>
+![](https://media.giphy.com/media/63MWfMm5UYyxJlhY0K/giphy.gif)
+</center>
+
+Normally, we would now conclude that yes, the privacy paradox indeed seems to be a thing, because on the basis of the data we cannot reject it. Which would be false, of course.
+
+But first let's run another study.
 
 ```{r}
 # define participants who we are going to be selected for the subsample
-sample <- sample(nrow(d), n)
+sample <- sample(nrow(d), n_sample)
 
 # create dataframe of subsample
 d_sample <- d[sample, ]
 
 # calculate correlation
 results_complete <- cor.test(d_sample$priv_con, 
-                                d_sample$inf_sha, 
-                                method = "pearson")
-
-# extract results
-results <- data.frame(results_complete$estimate,
-                      results_complete$p.value,
-                      ifelse(results_complete$p.value < .05, TRUE, FALSE))
+                             d_sample$inf_sha, 
+                             method = "pearson")
+print(results_complete)
 ```
 
-This time, we find a correlation of _r_ = `r results$r` and a p-value of _p_ = `r results$p`, which is `r ifelse(isTRUE(results$significant), print("significant"), print("not significant"))`. If we now repeat this a thousand times, this is what we get:
+This time, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`, which is significant. Hooray!
+
+<center>
+![](https://media.giphy.com/media/dMyMc3bF4FF9m/giphy.gif)
+</center>
+
+If we now repeat this a hundred times, this is what we would get:
 
 ```{r results='hide', eval=T}
 # number of studies to be run
-n_studies <- 2
+n_studies <- 100
 
 # initialize object
 results <- data.frame(study = 0, r = 0, p = 0, significant = TRUE)
@@ -135,7 +165,7 @@ results <- data.frame(study = 0, r = 0, p = 0, significant = TRUE)
 # run simulation
 for(i in 1:n_studies) {
   study_no <- i
-  sample <- sample(nrow(d), n)
+  sample <- sample(nrow(d), n_sample)
   d_sample <- d[sample, ]
   results_complete <- cor.test(d_sample$priv_con, 
                                d_sample$inf_sha, 
@@ -165,43 +195,62 @@ file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 
 ![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_50_animated.gif)
 
-What do we see? Correctly, a lot of red dots. Given that the relation actually does exist in the population, that seems too much. How often have we been right?
+What do we see? Sometime we get significant effects, sometime we don't. But given that the relation actually does exist in the population, that's bad. How often have we been right?
 
 ```{r}
 mean(results$significant)
 ```
 
-In `r sum(results$significant)` cases. In other words, we only had a `r mean(results$significant) * 100` % probability of finding the effect! (Hence, our statistical power was `r mean(results$significant) * 100` %.)
+In `r sum(results$significant)` cases. In other words, we only had a `r mean(results$significant) * 100`% probability, that is power, of finding the effect.
 
-Instead of counting beans, which is what we did here, it is also possible to calculate the achieved power statistically. Here, you can use the r package 'pwr'. 
+Instead of counting simulated data beans, it is also possible to calculate the achieved power statistically. For this you can use the r package `pwr`. 
+
+(Note that for more complex analyses such as multilevel modelling, it is preferrable to conduct power analyses using data simulations. For this, you can use packages/functions such as `lavaan::simulateData`, `psych::sim.multilevel`, `simsem`, `simstudy`, or Lisa de Bruine's `faux`.)
 
 ```{r}
-power <- pwr.r.test(n = n, r = -.13, sig.level = .05)
+power <- pwr.r.test(n = n_sample, r = -.13, sig.level = .05)
 print(power)
 ```
 
-As you can see, we get a very similar result: the power is `r power$power`.
+As you can see, we get a very similar result: the power is `r power$power * 100` %. But, before we continue, let's step back for a minute, it's important to understand what this all means. 
 
-Right, so let's step back for a minute. It's really important to understand what this means. If we want to analyze the privacy paradox, we would more often than not claim that there is no effect, that the privacy paradox indeed exists, when in fact it does not exist! In other words, with 200 people we simply cannot analyze the privacy paradox -- we'd be more often wrong than correct. In short, our study is not informative.
+<center>
+![](https://media.giphy.com/media/1wnnU9CLfjP0ON3Vjh/giphy.gif)
+</center>
 
-Of course, this does not only pertain to the privacy paradox. It is valid for all research questions where you would expect a small relation (here, _r_ = .13). Hence, if you read a paper analyzing a research question where you think "hmmm, this shouldn't lead be a large effect; instead it's probably small ...", and the study includes say 200 participants, the results simply don't tell you anything.
+If we want to analyze the privacy paradox, we would more often than not claim that there is no effect, that the privacy paradox indeed exists, when in fact it does not. In other words, with 200 people we simply cannot analyze the privacy paradox! Our study would not be informative, it would not add _anything_ to our understanding of the theoretical problem.
 
-So what level of power would be ideal? Now, remember that the effect actually exists. So of course, we want that our study has a very good chance of finding that effect -- otherwise, we're wasting important ressources and also come to false theoretical conclusions. So, in general, one can say the higher the better.
+Of course this does not only pertain to the privacy paradox. It is valid for _all_ research questions where you would expect a small relation. Hence, if you read a paper where you think "hmmm, this effect should most likely be small ... " and the study includes say 200 observations, you can stop reading at that point.
 
-Often people quote Cohen (1992) and state that our studies should have a power of 80 %. However, maybe it's just me, but I think that's too risky. If I only have a 80% probability of finding something that _actually exists_, I think I rather chip in more bucks and recruit additional participants. Ideally, so that I'd end up with a 95% probability. If I'm only missing something 5 times out of 100, that seems fair enough. 
+<center>
+![](https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif)
+</center>
 
-Right, but how many participants would I need to collect in order to attain that probability? Again, we can estimate that using 'pwr'.
+### How much power, how many observations?
+
+So what level of power would be ideal? Now, remember that in our example the effect actually exists. So of course we want our study to have a very good chance of finding that effect -- otherwise we would be wasting away important ressources, while risking to come up with false theoretical conclusions. So, in most scenarios it's safe to say that the more power the better.
+
+How much exactly? People often quote Cohen (1992) and state that studies should have a power of 80%. However, and maybe it's just me, but I think that's still too risky. If I only have a 80% probability of finding something that _actually exists_, I think I would rather invest more ressources and recruit additional participants. Personally, I would feel much more comfortable with 95% probability.
+
+<center>
+![](https://media.giphy.com/media/5wWf7GR2nhgamhRnEuA/giphy.gif)
+</center>
+
+But how many participants would we need to collect in order to attain that probability? Again, we can estimate that using the package `pwr`.
 
 ```{r}
-power <- pwr.r.test(r = -.13, sig.level = .05, power = .95)
+power_req <- .95
+power <- pwr.r.test(r = r_pop, sig.level = alpha_crit, power = power_req)
 print(power)
 ```
 
-As you can see, we would need to ask `r power$n` people, and then we'd have a 95% chance of getting a significant result. So let's see whether that really works!
+As we can see, in order to have a 95% chance of getting a significant result, we would need to ask `r power$n` people. 
+
+So let's go back to our simulated data to see whether that really works!
 
 ```{r results='hide', eval=T}
 # define sample size
-n <- power$n
+n_sample <- power$n
 
 # initialize object
 results <- data.frame(study = 0, r = 0, p = 0, significant = TRUE)
@@ -209,7 +258,7 @@ results <- data.frame(study = 0, r = 0, p = 0, significant = TRUE)
 # run simulation
 for(i in 1:n_studies) {
   study_no <- i
-  sample <- sample(nrow(d), n)
+  sample <- sample(nrow(d), n_sample)
   d_sample <- d[sample, ]
   results_complete <- cor.test(d_sample$priv_con, 
                                d_sample$inf_sha, 
@@ -239,18 +288,71 @@ file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 
 ![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_95_animated.gif)
 
-Indeed, it does. In `r sum(results$significant)` cases we found a significant result. In other words, we had a `r mean(as.numeric(results$significant)) * 100` % probability of finding the effect! Hence, our statistical power was `r mean(results$significant) * 100` %. 
+Indeed, it does! In `r sum(results$significant)` cases we found a significant result. In other words, we had a `r mean(as.numeric(results$significant)) * 100`% probability (power) of finding the effect.
 
-# Implications
+<center>
+![](https://media.giphy.com/media/9EC1okpxH360M/giphy.gif)
+</center>
+
+Before we wrap up, we still need to (briefly) focus on another important concept.
+
+## Smallest effect size of interest
+
+When trying to convince some colleagues of the necessity to run power analyses, I have often heard the following response: 
+
+"I'd like to, but for my research question there isn't yet a meta analysis that suggest the actual effect size -- so it's not possible to run meaningful a priori power analyses". 
+
+That's not true. In fact, instead of basing your power analysis on a meta-analysis (whose effect is likely to be biased anyway), it is more expedient to determine a so-called smallest effect size of interest (SESOI) (e.g., Lakens et al., 2018). In other words, you want to determine an effect size that you think is already large enough to qualify as proof for your theoretical assumption.
+
+But how to determine a SESOI? Full disclosure, it's very difficult. But as a first (!) step, you could for example say that your effect should at least be _small_ according to the conventions of Cohen (1992). More preferably, however, you should set a real life criterion using unstandardized effects (but that's a different issue for another post, which will be published soon). This SESOI you would then use for your power calculations.
+
+<center>
+![](https://media.giphy.com/media/km2mais9qzYI/giphy.gif)
+</center>
+
+In addition, setting a SESOI is crucial because p-values alone don't suffice as claim for your theory. If your effect is trivial, small p-values cannot compensate. So it's always both: Finding significance in order to determine the data's _surprisingness_, and evaluating effects sizes to gauge the effect's _relevance_.
 
 Now what does this mean for our research, and especially for bachelor and master theses ... ? 
 
-Above all, we want to run well-powered studies. For research questions where we need to expect small effect sizes, this means that we need to collect a large number of observations. In other words, for some research questions it needs a lot of ressources. But what do we do if we don't have a lot of ressources? There are several answers:
+## Implications
 
-## Look for already existing large scale data sets
+Above all, we want to run well-powered studies. For research questions where we need to expect small effect sizes, this means that we have to collect a large number of observations. In other words, for some research questions it simply needs *a* *ton* of ressources. 
 
-## Team up with others
+But what do we do if we don't have much ressources? Fortunately, there are several valid options:
 
-## Analyze a different research question
+**1. Look for already existing large scale data sets**
 
-This is just a test.
+By now, there is a myriad of publicly available large-scale open datasets. Several of these include items designed by social scientists and allow to conduct high quality analyses of topical questions. In [this blog-post](https://tobiasdienlin.com/blog/), I have compiled a list.
+
+**2. Use a different design that allows for the collection of more observations**
+
+Not the number of participants decides, but the number of observations. Often it is possible to run within-person designs, which allow for more observations and which are more efficient (e.g., Gelman, 2017).
+
+**3. Team up with others**
+
+Researchers routinely cooperate in order to be able to collect sufficient observations. Most prominently, in psychology there is the so-called [Psychological Science Accelerator](https://psysciacc.org/), which pools the resources of several labs in order to be able to design large-scale studies. In addition, an increasing number of researchers run so-called multi-site studies (without artifically focusing on cultural aspects). Also in BA, MA or PhD theses, it is highly advisable to join forces and to collect data together. Only because your advisor collected the data himself/herself, it does not mean that you have to as well.
+
+**4. Adapt your research questions**
+
+It might sound depressing, but sometimes there's no way around adapting or altogether leaving your research question. For example, if you're interested in priming effects induced by the subtlest of changes to your stimuli -- you either need a ton of ressources or a different research question. There's no inherent right to analyze a specific research question -- some are not feasible. But to our avail there are remedies: For example, it's often possible to use stimuli that are more salient, adopt a different research paradigm, or change general variables in favor of more specific ones -- all mechanisms that can increase your power.
+
+## Conclusion
+
+Power is extremely important. The empirical results of low-powered studies -- however well-designed and theoretically fine-tuned -- don't add anything to the literature. To determine adequate sample size, it's crucial to run a-priori power analyses, preferably based on a smallest effect size of interest. There are several different options we can choose from in order to achieve studies with adequate power. During this process, some customs and cultures might need to change, yes, but:
+
+Be the change you want to see. No reason to fret, we can do it.
+
+<center>
+![](https://media.giphy.com/media/3ofSB5PPO4cbZMK796/giphy.gif)
+</center>
+
+## References
+
+- Barnes, Susan B. 2006. "A privacy paradox: Social networking in the United States." First Monday 11 (9). www.firstmonday.org/issues/issue11_9/barnes/index.html.
+- Baruh, Lemi, Ekin Secinti, and Zeynep Cemalcilar. 2017. "Online privacy concerns and privacy management: A meta-analytical review." Journal of Communication 67 (1): 26--53. https://doi.org/10.1111/jcom.12276.
+- Cohen, Jacob. 1992. "A power primer." Psychological Bulletin 112 (1): 155--59. https://doi.org/10.1037/0033-2909.112.1.155.
+- Dienlin, T., & Metzger, M. J. (2016). An extended privacy calculus model for SNSs—Analyzing self-disclosure and self-withdrawal in a representative U.S. sample. Journal of Computer-Mediated Communication, 21(5), 368--383. https://doi.org/10.1111/jcc4.12163
+- Gelman, Andrew. 2017. "Poisoning the well with a within-person design? What’s the risk?" https://statmodeling.stat.columbia.edu/2017/11/25/poisoning-well-within-person-design-whats-risk/.
+- Lakens, D., Adolfi, F. G., Albers, C. J., Anvari, F., Apps, M. A. J., Argamon, S. E., . . . Zwaan, R. A. (2017). Justify your alpha: A response to "Redefine Statistical Significance".
+- Lakens, Daniel, Anne M. Scheel, and Peder M. Isager. 2018. "Equivalence testing for psychological research: A tutorial." Advances in Methods and Practices in Psychological Science 1 (2): 259--69. https://doi.org/10.1177/2515245918770963.
+- Rouder, Jeffrey N., Richard D. Morey, Josine Verhagen, Jordan M. Province, and Eric-Jan Wagenmakers. 2016. "Is there a free lunch in inference?" Topics in Cognitive Science 8 (3): 520--47. https://doi.org/10.1111/tops.12214.

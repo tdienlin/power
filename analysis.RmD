@@ -31,7 +31,7 @@ You probably haven't yet fully understood power.
 ![](https://media.giphy.com/media/3o7527pa7qs9kCG78A/giphy.gif)
 </center>
 
-At least that was the way _I_ felt. Once it really clicked, it became an absolute nobrainer that running a priori power analyses to determine adequate sample size is, above oll, in my very _own_ interest.
+At least that was the way _I_ felt. Once it really clicked, it became an absolute nobrainer that running a priori power analyses to determine adequate sample size is, above all, in my very _own_ interest.
 
 ## What is power?
 
@@ -135,7 +135,9 @@ As a result, we find a correlation of _r_ = `r results_complete$estimate` and a 
 ![](https://media.giphy.com/media/63MWfMm5UYyxJlhY0K/giphy.gif)
 </center>
 
-Normally, we would now conclude that yes, the privacy paradox indeed seems to be a thing, because on the basis of the data we cannot reject it. So we would incorrectly conclude that there is nothing -- although we know there is an effect!
+Normally, we would now conclude that yes, the privacy paradox indeed seems to be a thing, because on the basis of the data we cannot reject it. So we would incorrectly conclude that there is nothing -- although we know there is an effect! 
+
+That being said, a non-significant result does not imply that there is _no_ effect. Such an inference would be erroneous for two reasons: First, a non-significant result in a classical null hypothesis testing approach does cannot _approve_ the null hypothesis (in this case, that the relationship is really zero). To draw such an inference, we would need to use a different approach (e.g., equivalence testing or bayesian statistics). Second, and more important for understanding power, it could be that we simply missed to find the true effect. As said before, we know that there is a true effect. So what went wrong?
 
 But first let's run another study.
 
@@ -153,7 +155,7 @@ results_complete <- cor.test(d_sample$priv_con,
 print(results_complete)
 ```
 
-This time, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`, which is significant. Hooray!
+This time, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`, which is significant. Hooray! Drawing another sample (with the same sample size) thus gives us a different result. 
 
 <center>
 ![](https://media.giphy.com/media/dMyMc3bF4FF9m/giphy.gif)
@@ -238,7 +240,7 @@ Of course this does not only pertain to the privacy paradox. It is valid for _al
 
 So what level of power would be ideal? Now, remember that in our example the effect actually exists. So of course we want our study to have a very good chance of finding that effect -- otherwise we would be wasting important ressources, while risking to come up with false theoretical conclusions. Therefore, in most scenarios it's safe to say that the more power the better.
 
-How much exactly? People often quote Cohen (1992) and state that studies should have a power of 80%. However, and maybe it's just me, but I think that's still too risky. If I only have a 80% probability of finding something that _actually exists_, I think I would rather invest more ressources and recruit additional participants. Personally, I most cases I would feel much more comfortable with 95% probability.
+How much exactly? People often quote Cohen (1992) and state that studies should have a power of 80%. However, and maybe it's just me, but I think that's still too risky. If I only have a 80% probability of finding something that _actually exists_, I think I would rather invest more ressources and recruit additional participants. Personally, in most cases I would feel much more comfortable with 95% probability.
 
 <center>
 ![](https://media.giphy.com/media/5wWf7GR2nhgamhRnEuA/giphy.gif)
@@ -322,6 +324,8 @@ That's not true. In fact, instead of basing your power analysis on a meta-analys
 
 But how to determine a SESOI? Full disclosure, it's very difficult. But as a first (!) step, you could for example say that your effect should be at least _small_ according to the conventions of Cohen (1992). More preferably, however, you would set a real life criterion using unstandardized effects (but that's a different issue for another post, which will be published soon). This SESOI you would then use for your power calculations.
 
+Even if you absolutely no idea about what effect size to expect, you can still be reasonable in making broad assumptions. In a recent meta-analysis of meta-analyses in communication science, Rains, Levine & Weber (2018) found the following: "Most effect size estimates reported in communication research are small or small-to-medium following Cohen’s (1988) benchmarks. The mean effect was r = .21, but because the distribution was skewed, the mean does not describe the majority. The median of r = .18 separates the upper and lower 50% of the findings. Twenty-five percent of the effects in the sample were equal to or less than r = .10, and 75% were less than r = .29. Only 6% of findings were r = .50 or greater." (p. 118). If you are thinking about using an effect size of r > .21 in your power analysis, be sure to have good arguments for why your study should find a larger effect size than the average study in all of communication research.
+
 In addition, setting a SESOI is crucial because p-values alone don't suffice as claim for your theory. If your effect is trivial, small p-values cannot compensate. So it's always both: Finding significance in order to determine the data's _surprisingness_, and evaluating effects sizes in order to gauge the effect's _relevance_.
 
 Now what does this mean for our research, and especially for bachelor and master theses ... ? 
@@ -373,4 +377,5 @@ Be the change you want to see. No reason to fret, we can do it.
 - Gelman, Andrew. 2017. "Poisoning the well with a within-person design? What's the risk?" https://statmodeling.stat.columbia.edu/2017/11/25/poisoning-well-within-person-design-whats-risk/.
 - Lakens, D., Adolfi, F. G., Albers, C. J., Anvari, F., Apps, M. A. J., Argamon, S. E., . . . Zwaan, R. A. (2017). Justify your alpha: A response to "Redefine Statistical Significance".
 - Lakens, Daniel, Anne M. Scheel, and Peder M. Isager. 2018. "Equivalence testing for psychological research: A tutorial." Advances in Methods and Practices in Psychological Science 1 (2): 259--69. https://doi.org/10.1177/2515245918770963.
+- Rains, S. A., Levine, T. R. & Weber, R. (2018). Sixty years of quantitative communication research summarized: Lessons from 149 meta-analyses. Annals of the International Communication Association, 42(2), 105-124, https://doi.org/10.1080/23808985.2018.1446350
 - Rouder, Jeffrey N., Richard D. Morey, Josine Verhagen, Jordan M. Province, and Eric-Jan Wagenmakers. 2016. "Is there a free lunch in inference?" Topics in Cognitive Science 8 (3): 520--47. https://doi.org/10.1111/tops.12214.

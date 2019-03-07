@@ -35,9 +35,7 @@ At least that was the way _I_ felt. Once it really clicked with me, it became an
 
 ## What is power?
 
-In short, it describes the probabilility of being able to cry "Eureka! I found it!", when in fact there was something that could be found. In other words, if there is an effect, how often will you find it in the long run? Often, though not always, finding an effect is exactly what you want, which is why ideally you would want to increase that probability. 
-
-More specifically, the power of a study can be calculated once you know:
+In short, it describes the probabilility of being able to cry "Eureka! I found it!", when in fact there was something that could be found. In other words, if there is an effect, how often will you find it in the long run? More specifically, the power of a study can be calculated once you know:
 
 - What _test_ you want to run (say, a correlation or an ANOVA) 
 - What _effect_ you want to be able to find (e.g., _r_ = .1, _d_ = .2)
@@ -110,7 +108,7 @@ Yes indeed, in our population we have a correlation of _r_ = -.13.
 
 Now, let's imagine we are running a study to find out whether the privacy paradox exists. Because we cannot ask all 10,000 students, we are going to collect a sample. 
 
-How many? Good question. 200 seems quite a lot -- that should do the job, right? So from the population, we will now draw a sample of 200 students from the population and estimate the correlation. Will we find an effect ... ?
+How many? Good question. 200 seems quite a lot -- that should do the job, right? So from the population, we will now draw a sample of 200 students and estimate the correlation. Will we find an effect ... ?
 
 ```{r}
 # define sample size
@@ -135,13 +133,11 @@ We find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p
 ![](https://media.giphy.com/media/63MWfMm5UYyxJlhY0K/giphy.gif)
 </center>
 
-On the basis of the results we could not reject the privacy paradox. We would even feel tempted to conclude that indeed, the behavior of people seems somewhat paradoxical. 
+On the basis of the results we could therefore not reject the privacy paradox. We would even feel tempted to conclude that indeed, the behavior of people seems to be somewhat paradoxical. 
 
-(Bear in mind that a nonsignificant result in frequentist null hypothesis testing, which is what we have done here, can never actually support the null hypothesis (in this case, that the relationship is zero). To draw such an inference, we would need to use a different approach; e.g., equivalence testing or Bayesian statistics.) 
+(Bear in mind that a nonsignificant result in frequentist null hypothesis testing, which is what we have done here, can never actually support the null hypothesis. To draw such an inference, we would need to use a different approach; e.g., equivalence testing or Bayesian statistics.) 
 
-However, remember that in the population there is an actual effect! So what went wrong? Bad luck? 
-
-Let us run another study. Again, we draw a random sample of 200 students from our population. Maybe this time we get lucky?
+However, remember that in the population there is an actual effect! So what went wrong? Bad luck? To find out, let us run another study. Again, we draw a random sample of 200 students from our population. Maybe this time we get lucky?
 
 ```{r}
 # define participants who we are going to be selected for the subsample
@@ -157,7 +153,7 @@ results_complete <- cor.test(d_sample$priv_con,
 print(results_complete)
 ```
 
-Indeed, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`, which is significant. Hooray! Drawing another sample (with the same sample size) thus gives us a different result. 
+Indeed, we find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p_ = `r results_complete$p.value`, which is significant. Drawing another sample (with the same sample size) thus gave us a positive result. Hooray! 
 
 <center>
 ![](https://media.giphy.com/media/dMyMc3bF4FF9m/giphy.gif)
@@ -205,7 +201,7 @@ file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 
 ![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_50_animated.gif)
 
-What do we see? On the x-axis, you see the number of each study (1 - 100), whereas the y-axis shows the effect size we found for each study. The blue dots represent significant effects, the red dots represent nonsignificant ones. 
+What do we see? On the x-axis, you see the number of each study (1 - 100). The y-axis shows the effect size we found for each study. The blue dots represent significant effects, the red dots represent nonsignificant ones. 
 
 What does this mean? Sometimes we get significant effects, sometimes we don't. But given that the relation actually does exist in the population, that is bad. How often have we been right?
 
@@ -230,7 +226,7 @@ As you can see, we get a very similar result: the power is `r power$power * 100`
 ![](https://media.giphy.com/media/1wnnU9CLfjP0ON3Vjh/giphy.gif)
 </center>
 
-If we want to analyze the privacy paradox, we would more often than not claim that there is no effect, that the privacy paradox does exis exist, when in fact it does not. In other words, with 200 people we simply cannot analyze the privacy paradox! Our study would not be informative, it would not add _anything_ to our understanding of the theoretical problem.
+If we want to analyze the privacy paradox, we would more often than not claim that there is no effect, that the privacy paradox might exist, when in fact it does not. In other words, with 200 people we simply cannot analyze the privacy paradox! Our study would not be informative, it would not add _anything_ to our understanding of the theoretical problem.
 
 Of course this does not only pertain to the privacy paradox. It is valid for _all_ research questions where you would expect a similar-sized, small effect (here, _r_ = .13), and which is analyzed on the basis of a small sample. Hence, if you read a paper where you think "hmmm, this effect should most likely be small ... " and the study includes, say, 200 observations, you can stop reading at that point.
 
@@ -302,7 +298,7 @@ file.remove(paste0("figures/", list.files(path = "figures/", pattern=".png")))
 
 ![](https://raw.githubusercontent.com/tdienlin/power/master/figures/power_95_animated.gif)
 
-Indeed, it does! In `r sum(results$significant)` cases we found a significant result. In other words, we had a `r mean(as.numeric(results$significant)) * 100`% probability (power) of finding the effect.
+Indeed, it does! With our larger sample of `r round(power$n, 0)` participants, we found a significant effect in `r sum(results$significant)` cases. In other words, we had a `r mean(as.numeric(results$significant)) * 100`% probability (power) of finding the effect!
 
 <center>
 ![](https://media.giphy.com/media/9EC1okpxH360M/giphy.gif)
@@ -318,9 +314,9 @@ When trying to convince some colleagues of the necessity to run power analyses, 
 
 "I'd like to, but there is no meta-analysis for my research question that suggests the actual effect size -- so it's not possible to run meaningful a priori power analyses". 
 
-First off, if you have absolutely no idea about what effect size to expect, you could at least refer to the general effect sizes that are typically found in your field. In communication science, for example, Rains, Levine, & Weber (2018) reported in a recent meta-review that "Most effect size estimates reported in communication research are small or small-to-medium following Cohen’s (1988) benchmarks." (p. 118). Specifically, the median effect size was _r_ = .18.
+First off, if you have absolutely no idea about what effect size to expect, you could at least refer to the general effect sizes that are typically found in your field. In communication science, for example, Rains, Levine, & Weber (2018) reported in a recent meta-review that "Most effect size estimates reported in communication research are small or small-to-medium following Cohen's (1988) benchmarks." (p. 118). Specifically, the median effect size was _r_ = .18.
 
-However, instead of basing your power analysis on a meta-analysis/meta-review (whose effect is likely to be inflated anyway), it is _much_ more useful to determine a so-called smallest effect size of interest (SESOI) (e.g., Lakens et al., 2018). In other words, you want to define an effect size that you think is already large enough to qualify as support for your theoretical assumption.
+However, instead of basing your power analysis on a meta-analysis/meta-review (whose effect is likely to be inflated anyway), it is much more useful to determine a so-called smallest effect size of interest (SESOI) (e.g., Lakens et al., 2018). In other words, you want to define an effect size that you think is already large enough to qualify as support for your theoretical assumption.
 
 <center>
 ![](https://media.giphy.com/media/km2mais9qzYI/giphy.gif)
@@ -336,7 +332,7 @@ Now what does this mean for our research, and especially for bachelor and master
 
 Above all, we want to run well-powered studies. For research questions where we need to expect small effect sizes this means that we have to collect a large number of observations. In other words, some research questions simply require *a* *ton* of resources. 
 
-But what do we do if we do have little resources? Fortunately, there are several valid options:
+But what do we do if we have little resources? Fortunately, there are several valid options:
 
 **1. Look for already existing large-scale data sets**
 
@@ -352,7 +348,7 @@ Researchers routinely cooperate so they are able to collect sufficient observati
 
 **4. Adapt your research questions**
 
-It might sound depressing, but sometimes there is no way around adapting or altogether dismissing your research question. For example, if you are interested in priming effects induced by the subtlest of changes to your stimuli, then you either need a ton of resources or a different research question. There is no inherent prerogative to analyze a specific research question -- some are not feasible. But fortunately there are remedies: For instance, it is often possible to use stimuli that are more salient, adopt a different research paradigm, or change general variables in favor of more specific ones -- all of these mechanisms increase your power.
+It might sound depressing, but sometimes there is no way around adapting or altogether dismissing your research question. For example, if you are interested in priming effects induced by the subtlest of changes to your stimuli, then you either need a ton of resources or a different research question. There is no inherent prerogative to analyze a specific research question -- some are not feasible. But fortunately there are remedies: For instance, it is often possible to use stimuli that are more salient, adopt a different research paradigm, or change general variables in favor of more specific ones -- all of these mechanisms can increase your power.
 
 ## Conclusion
 
@@ -370,18 +366,17 @@ Be the change you want to see. No reason to fret, we can do it.
 - [How a power analysis implicitly reveals the smallest effect size you care about](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html) by Daniel Lakens.
 - [A power primer](https://www.ime.usp.br/~abe/lista/pdfn45sGokvRe.pdf) by Jacob Cohen.
 
-Thanks go out to Niklas, Philipp, Romy, and Sabine who all provided valuable feedback to this blog post! Thank you very much! 
-In general, I'm always happy to get feedback. So if you've spotted something that's false or if you have further recommendations, please let me know -- I'm here to learn!
+Thanks go out to Niklas, Philipp, Romy, and Sabine who all provided valuable feedback to this blog post! In general, I'm always happy to get feedback. So if you've spotted something that's false or if you have further recommendations, please let me know!
 
 ## References
 
 - Barnes, S. B. (2006). A privacy paradox: Social networking in the United States. _First Monday_, 11(9). Retrieved from www.firstmonday.org/issues/issue11_9/barnes/index.html
-- Baruh, L., Secinti, E., & Cemalcilar, Z. (2017). Online privacy concerns and privacy management: A meta-analytical review. _Journal of Communication_, 67(1), 26–53. https://doi.org/10.1111/jcom.12276
-- Button, K. S., Ioannidis, J. P. A., Mokrysz, C., Nosek, B. A., Flint, J., Robinson, E. S. J., & Munafò, M. R. (2013). Power failure: Why small sample size undermines the reliability of neuroscience. _Nature Reviews. Neuroscience_, 14(5), 365–376. https://doi.org/10.1038/nrn3475
-- Cohen, J. (1992). A power primer. _Psychological Bulletin_, 112(1), 155–159. https://doi.org/10.1037/0033-2909.112.1.155
+- Baruh, L., Secinti, E., & Cemalcilar, Z. (2017). Online privacy concerns and privacy management: A meta-analytical review. _Journal of Communication_, 67(1), 26--53. https://doi.org/10.1111/jcom.12276
+- Button, K. S., Ioannidis, J. P. A., Mokrysz, C., Nosek, B. A., Flint, J., Robinson, E. S. J., & Munafo, M. R. (2013). Power failure: Why small sample size undermines the reliability of neuroscience. _Nature Reviews. Neuroscience_, 14(5), 365--376. https://doi.org/10.1038/nrn3475
+- Cohen, J. (1992). A power primer. _Psychological Bulletin_, 112(1), 155--159. https://doi.org/10.1037/0033-2909.112.1.155
 - Dienlin, T., & Metzger, M. J. (2016). An extended privacy calculus model for SNSs---Analyzing self-disclosure and self-withdrawal in a representative U.S. sample. _Journal of Computer-Mediated Communication_, 21(5), 368--383. https://doi.org/10.1111/jcc4.12163
-- Gelman, A. (2017). Poisoning the well with a within-person design? What’s the risk? Retrieved from https://statmodeling.stat.columbia.edu/2017/11/25/poisoning-well-within-person-design-whats-risk/
+- Gelman, A. (2017). Poisoning the well with a within-person design? What's the risk? Retrieved from https://statmodeling.stat.columbia.edu/2017/11/25/poisoning-well-within-person-design-whats-risk/
 - Lakens, D., Adolfi, F. G., Albers, C. J., Anvari, F., Apps, M. A. J., Argamon, S. E., . . . Zwaan, R. A. (2017). Justify your alpha: A response to Redefine Statistical Significance.
-- Lakens, D., Scheel, A. M., & Isager, P. M. (2018). Equivalence testing for psychological research: A tutorial. _Advances in Methods and Practices in Psychological Science_, 1(2), 259–269. https://doi.org/10.1177/2515245918770963
+- Lakens, D., Scheel, A. M., & Isager, P. M. (2018). Equivalence testing for psychological research: A tutorial. _Advances in Methods and Practices in Psychological Science_, 1(2), 259--269. https://doi.org/10.1177/2515245918770963
 - Rains, S. A., Levine, T. R. & Weber, R. (2018). Sixty years of quantitative communication research summarized: Lessons from 149 meta-analyses. _Annals of the International Communication Association_, 42(2), 105-124, https://doi.org/10.1080/23808985.2018.1446350
-- Rouder, J. N., Morey, R. D., Verhagen, J., Province, J. M., & Wagenmakers, E.-J. (2016). Is there a free lunch in inference? _Topics in Cognitive Science_, 8(3), 520–547. https://doi.org/10.1111/tops.12214
+- Rouder, J. N., Morey, R. D., Verhagen, J., Province, J. M., & Wagenmakers, E.-J. (2016). Is there a free lunch in inference? _Topics in Cognitive Science_, 8(3), 520--547. https://doi.org/10.1111/tops.12214

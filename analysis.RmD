@@ -11,13 +11,17 @@ knitr::opts_chunk$set(warning = F, message = F)
 options(digits = 2)
 ```
 
-In Germany we have the following saying: Everything that you need to know about power has already been said -- but not yet by everyone. For what it's worth, in what follows I take my own turn and try to explain the concept of statistical power using simple words, simulations of data, and some gifs.
+In Germany we have the following saying: Everything has already been said -- but not yet by everyone. For what it's worth, in what follows I take my own turn and try to explain the concept of statistical power using simple words, simulations of data, and some gifs.
 
-Note that this post is written primarily for students in order to provide some guidelines for empirical theses or reports. I will provide the R-code necessary for all the analyses, and you can also download everything from my [github](https://github.com/tdienlin/power). 
+Note that this post is written primarily for students in order to provide some guidelines for empirical theses or reports. I provide the R-code necessary for the analyses, and you can also download everything from my [github](https://github.com/tdienlin/power). 
 
 <center>
 ![](https://media.giphy.com/media/1M9fmo1WAFVK0/giphy.gif)
 </center>
+
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
 
 ## Why should I care about power?
 
@@ -35,14 +39,22 @@ At least that was the way _I_ felt. Once it really clicked with me, it became an
 
 ## What is power?
 
-In short, it describes the probabilility of being able to cry "Eureka! I found it!", when in fact there was something that could be found. In other words, if there is an effect, how often will you find it in the long run? More specifically, the power of a study can be calculated once you know:
+In short, it describes the probabilility of being able to cry "Eureka! I found it!", when in fact there was something that could be found. In other words, if there is an effect, how often will you find it in the long run?
+[note]
+For more technical explanations of power, see: [Why you should think of statistical power as a curve](http://psychbrief.com/power-curve/) by psychbrief, [How a power analysis implicitly reveals the smallest effect size you care about](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html) by Daniel Lakens, or [A power primer](https://www.ime.usp.br/~abe/lista/pdfn45sGokvRe.pdf) by Jacob Cohen.
+[/note]
+
+More specifically, the power of a study can be calculated once you know:
 
 - What _test_ you want to run (say, a correlation or an ANOVA) 
 - What _effect_ you want to be able to find (e.g., _r_ = .1, _d_ = .2)
 - The probability of committing an _alpha error_ (the convention is 5%. Pros, however, justify their choice of alpha specifically for each study depending on what is at stake; Lakens et al., 2017)
 - The _number of observations_ you have collected (e.g., _n_ = 200)
 
-But calculations are one thing. What is even more illustrative are simulations. I think I only really started to understand power once I had seen some tutorials with simulations of actual data (see, for example, Laken's excellent mooc [Improving your statistical inferences](https://www.coursera.org/learn/statistical-inferences)). 
+But calculations are one thing. What is even more illustrative are simulations. I think I only really started to understand power once I had seen some tutorials with simulations of actual data.
+[note]
+See, for example, Laken's excellent mooc [Improving your statistical inferences](https://www.coursera.org/learn/statistical-inferences)).
+[/note]
 
 The main advantage of simulating your own data is that you can actually specify the *true* effect in the population. So, by definition, you _know_ what result your study should reveal.
 
@@ -66,9 +78,10 @@ Let's imagine we want to find out whether the privacy paradox exists among the s
 
 ### Data simulation
 
-Currently, 10,000 students (our population) are enrolled at Hohenheim. Building on Baruh et al. (2017), we define the actual correlation between privacy concerns and information sharing to be _r_ = -.13. 
-
-(For simplicity's sake, I am sticking with standardized effects throughout this blog. I know that unstandardized effects would be preferable, but it is a bit easier both from a didactical and data-simulation perspective.)
+Currently, 10,000 students (our population) are enrolled at Hohenheim. Building on Baruh et al. (2017), we define the actual correlation between privacy concerns and information sharing to be _r_ = -.13.
+[note]
+For simplicity's sake, I am sticking with standardized effects throughout this blog. I know that unstandardized effects would be preferable, but it is a bit easier both from a didactical and data-simulation perspective.
+[/note]
 
 ```{r}
 # load packages
@@ -133,9 +146,10 @@ We find a correlation of _r_ = `r results_complete$estimate` and a p-value of _p
 ![](https://media.giphy.com/media/63MWfMm5UYyxJlhY0K/giphy.gif)
 </center>
 
-On the basis of the results we could therefore not reject the privacy paradox. We would even feel tempted to conclude that indeed, the behavior of people seems to be somewhat paradoxical. 
-
-(Bear in mind that a nonsignificant result in frequentist null hypothesis testing, which is what we have done here, can never actually support the null hypothesis. To draw such an inference, we would need to use a different approach; e.g., equivalence testing or Bayesian statistics.) 
+On the basis of the results we could therefore not reject the privacy paradox. We would even feel tempted to conclude that indeed, the behavior of people seems to be somewhat paradoxical.
+[note]
+Bear in mind that a nonsignificant result in frequentist null hypothesis testing, which is what we have done here, can never actually support the null hypothesis. To draw such an inference, we would need to use a different approach; e.g., equivalence testing or Bayesian statistics.
+[/note]
 
 However, remember that in the population there is an actual effect! So what went wrong? Bad luck? To find out, let us run another study. Again, we draw a random sample of 200 students from our population. Maybe this time we get lucky?
 
@@ -211,9 +225,10 @@ mean(results$significant)
 
 In `r sum(results$significant)` cases. In other words, we only had a `r mean(results$significant) * 100`% probability, that is power, of finding the effect.
 
-Instead of counting simulated data beans, it is also possible to calculate the achieved power statistically. For this you can use the r package `pwr`. 
-
-(Note that for more complex analyses such as multilevel modelling, it is preferable to conduct power analyses using data simulations. For this, you can use packages/functions such as `lavaan::simulateData`, `psych::sim.multilevel`, `simsem`, `simstudy`, or Lisa DeBruine's `faux`.)
+Instead of counting simulated data beans, it is also possible to calculate the achieved power statistically. For this you can use the r package `pwr`.
+[note]
+Note that for more complex analyses such as multilevel modelling, it is preferable to conduct power analyses using data simulations. For this, you can use packages/functions such as `lavaan::simulateData`, `psych::sim.multilevel`, `simsem`, `simstudy`, or Lisa DeBruine's `faux`.
+[/note]
 
 ```{r}
 power <- pwr.r.test(n = n_sample, r = -.13, sig.level = .05)
@@ -239,12 +254,13 @@ Of course this does not only pertain to the privacy paradox. It is valid for _al
 So what level of power is ideal? Now, remember that in our example the effect actually does exist. So of course we want our study to have a very good chance of finding that effect -- otherwise we would be wasting important resources, while risking to come up with false theoretical conclusions. Therefore, in most scenarios it is safe to say that the more power the better.
 
 How much exactly? People often quote Cohen (1992) and state that studies should have a power of 80%. Maybe it is just me, but I think that is still too risky. If the probability of finding something that actually exists is 80%, I think I would rather invest more resources and recruit additional participants to make the study more informative. In most cases I would feel much more comfortable with a probability of 95%.
+[note]
+Similar to the alpha error, it is an even better idea to also specifically justify one's power depending on what is at stake. For starters, it is sensible to balance one's alpha and beta errors; Rouder et al., 2016.
+[/note]
 
 <center>
 ![](https://media.giphy.com/media/5wWf7GR2nhgamhRnEuA/giphy.gif)
 </center>
-
-(Similar to the alpha error, it is an even better idea to also specifically justify one's power depending on what is at stake. For starters, it is sensible to balance one's alpha and beta errors; Rouder et al., 2016)
 
 But how many participants would we need in order to attain that probability? Again, we can estimate that using the package `pwr`.
 
@@ -360,14 +376,6 @@ Be the change you want to see. No reason to fret, we can do it.
 ![](https://media.giphy.com/media/3ofSB5PPO4cbZMK796/giphy.gif)
 </center>
 
-## Further Readings
-
-- [Why you should think of statistical power as a curve](http://psychbrief.com/power-curve/) by psychbrief.
-- [How a power analysis implicitly reveals the smallest effect size you care about](http://daniellakens.blogspot.com/2017/05/how-power-analysis-implicitly-reveals.html) by Daniel Lakens.
-- [A power primer](https://www.ime.usp.br/~abe/lista/pdfn45sGokvRe.pdf) by Jacob Cohen.
-
-Thanks go out to Niklas, Philipp, Romy, and Sabine who all provided valuable feedback to this blog post! In general, I'm always happy to get feedback. So if you've spotted something that's false or if you have further recommendations, please let me know!
-
 ## References
 
 - Barnes, S. B. (2006). A privacy paradox: Social networking in the United States. _First Monday_, 11(9). Retrieved from www.firstmonday.org/issues/issue11_9/barnes/index.html
@@ -380,3 +388,15 @@ Thanks go out to Niklas, Philipp, Romy, and Sabine who all provided valuable fee
 - Lakens, D., Scheel, A. M., & Isager, P. M. (2018). Equivalence testing for psychological research: A tutorial. _Advances in Methods and Practices in Psychological Science_, 1(2), 259--269. https://doi.org/10.1177/2515245918770963
 - Rains, S. A., Levine, T. R. & Weber, R. (2018). Sixty years of quantitative communication research summarized: Lessons from 149 meta-analyses. _Annals of the International Communication Association_, 42(2), 105-124, https://doi.org/10.1080/23808985.2018.1446350
 - Rouder, J. N., Morey, R. D., Verhagen, J., Province, J. M., & Wagenmakers, E.-J. (2016). Is there a free lunch in inference? _Topics in Cognitive Science_, 8(3), 520--547. https://doi.org/10.1111/tops.12214
+
+## Acknowledgements
+
+Thanks go out to Niklas, Philipp, Romy, and Sabine who all provided valuable feedback to this blog post! In general, I'm always happy to get feedback. So if you've spotted something that's false or if you have further recommendations, please let me know.
+
+## Social Media
+
+<!-- wp:core-embed/twitter {"url":"https://twitter.com/tdienlin/status/1103692112158212096?s=20","type":"rich","providerNameSlug":"twitter"} -->
+<figure class="wp-block-embed-twitter wp-block-embed is-type-rich is-provider-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/tdienlin/status/1103692112158212096?s=20
+</div></figure>
+<!-- /wp:core-embed/twitter -->
